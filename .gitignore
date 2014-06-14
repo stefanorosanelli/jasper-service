@@ -1,4 +1,4 @@
 /bin
 .project
-/samples/+.jasper
-/samples/+.pdf
+/samples/*.jasper
+/samples/*.pdf
