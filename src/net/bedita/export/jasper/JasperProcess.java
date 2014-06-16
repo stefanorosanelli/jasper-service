@@ -22,10 +22,13 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 public class JasperProcess {
 
+    protected final Log log = LogFactory.getLog(getClass());
 
 	/**
 	 * @param args
@@ -43,6 +46,7 @@ public class JasperProcess {
         if (cmd.hasOption("h")) {
         	HelpFormatter formatter = new HelpFormatter();
         	formatter.printHelp("jasper-service", options, true);
+        	return;
         }
         
         String report = cmd.getOptionValue("r");
@@ -69,13 +73,15 @@ public class JasperProcess {
         options.addOption("d", "data-file", true, "data file path (i.e. .xml data file");
         options.addOption("o", "output", true, "output file path");
         options.addOption("s", "sub-reports", true, "comma saparated list of jasper subreports");
-        options.addOption("h", "help", false, "help message");
+        options.addOption("h", "help", false, "this help message");
         return options;
     }
     
     public void compileReports(String report, String[] subReports) throws IOException, JRException {
+    	log.info("compiling report: " + report);
     	compileReport(report);
     	for (String subRep : subReports) {
+        	log.info("compiling subreport: " + subRep);
     		compileReport(subRep);
     	}
     }
@@ -92,7 +98,9 @@ public class JasperProcess {
     }
     
     public void pdf(String reportFile, Map<String, Object> params, String destFile) throws JRException, IOException {
+    	log.debug("generating print data");
         JasperPrint print = JasperFillManager.fillReport(reportFile, params);
+    	log.debug("exporting to pdf file: " + destFile);
         JasperExportManager.exportReportToPdfFile(print, destFile);
     }
 	
@@ -116,7 +124,10 @@ public class JasperProcess {
         }
         
         if(!compiled.exists() || (compiled.lastModified() < source.lastModified())) {
+        	log.debug("compiling source report: " + sourceFileName);
             JasperCompileManager.compileReportToFile(sourceFileName, jasperFileName);
+        } else {
+        	log.debug("source report compilation not needed");        	
         }
     }
 
