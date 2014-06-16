@@ -67,6 +67,7 @@ public class JasperProcess {
 
         JasperProcess jasperProc = new JasperProcess();
         jasperProc.generate(report, subReports, dataFile, destFile);
+    	System.out.println("output file created: " + destFile);
     }
 
     
@@ -93,6 +94,7 @@ public class JasperProcess {
         	log.debug("using odt format");
             odt(print, destFile);        	        	
         }  else {
+        	log.warn("unsupported format for file: " + destFile);
         	System.out.println("unsupported format for file: " + destFile);
         	System.out.println("supported formats: pdf, docx, rtf and odt");        	
         }
