@@ -53,13 +53,6 @@ public class JasperProcess {
         }
         String xmlFile = cmd.getOptionValue("d");
         String destFile = cmd.getOptionValue("o");
-        
-//        String reportPath = args[0];
-//        String sep = File.separator;
-//        String report = reportPath + sep + "CustomersReport.jasper";
-//        String[] subReports = {reportPath + sep + "OrdersReport.jasper"};
-//        String xmlFile = reportPath + sep + "northwind.xml";
-//        String destFile = reportPath + sep + "customers.pdf";
 
         JasperProcess jasperProc = new JasperProcess();
         jasperProc.compileReports(report, subReports);
@@ -75,7 +68,7 @@ public class JasperProcess {
         options.addOption("r", "report", true, "jasper report file path (.jasper file), absolute or relative");
         options.addOption("d", "data-file", true, "data file path (i.e. .xml data file");
         options.addOption("o", "output", true, "output file path");
-        options.addOption("s", "sub-reports", false, "comma saparated list of jasper subreports");
+        options.addOption("s", "sub-reports", true, "comma saparated list of jasper subreports");
         options.addOption("h", "help", false, "help message");
         return options;
     }
