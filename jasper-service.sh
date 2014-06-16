@@ -1,8 +1,10 @@
 #!/bin/sh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR=$( cd "$( dirname "$0" )" && pwd )
+cd "$DIR"
+
 echo "script dir: $DIR"
-JAR="$DIR/bin/jasper-service.jar"
+JAR="bin/jasper-service.jar"
 
 JAVA=java
 if test -n "$JAVA_HOME"; then
@@ -10,7 +12,7 @@ if test -n "$JAVA_HOME"; then
 fi
 
 # check log4j file presence
-L4J_CFG="$DIR/conf/log4j.properties"
+L4J_CFG="conf/log4j.properties"
 LOG_OPTS=
 if [ -f "$L4J_CFG" ]; then
     LOG_OPTS="-Dlog4j.configuration=file:$L4J_CFG"
@@ -20,6 +22,6 @@ if test -n "$JAVA_HOME"; then
     JAVA="$JAVA_HOME/bin/java"
 fi
 
-CMD="$JAVA $LOG_OPTS -jar $JAR $@"
-echo "$CMD"
-exec "$CMD"
+exec "$JAVA" "$LOG_OPTS" -jar "$JAR" "$@"
+#echo "$CMD"
+#exec "$CMD"
