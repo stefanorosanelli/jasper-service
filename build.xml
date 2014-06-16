@@ -1,0 +1,40 @@
+<project name="jasper-service" default="dist" basedir=".">
+  <description>Create jasper-service jar</description>
+ 
+  <property name="src.dir" value="src" />
+  <property name="build.dir" value="build" />
+  <property name="bin.dir" value="bin" />
+  <property name="conf.dir" value="conf" />
+
+  <property name="javac.source" value="1.6" />
+  <property name="javac.target" value="1.6" />
+
+  <property name="jars.dir"  value="libs"/>
+  
+  <target name="init">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${bin.dir}"/>
+  </target>
+  
+  <target name="build" depends="init" description="compiles ${src.dir}" >
+  	<javac srcdir="${src.dir}" destdir="${build.dir}"
+		fork="yes"  debug="on" debuglevel="lines,vars,source" target="${javac.target}"  source="${javac.source}" >
+		<compilerarg value="-deprecation" />
+		<classpath>
+			<fileset dir="${jars.dir}">
+				<include name="*.jar"/>
+			</fileset>
+		</classpath>
+	</javac>
+ </target>
+ 
+  <target name="dist" depends="build" description="genera jar, war e ear" >
+  	<jar destfile="${bin.dir}/jasper-service.jar" manifest="${conf.dir}/MANIFEST.MF">
+		<fileset dir="${build.dir}" />
+	</jar>
+  </target>
+
+  <target name="clean" description="clean up" >
+    <delete dir="${build.dir}"/>
+  </target>
+</project>
