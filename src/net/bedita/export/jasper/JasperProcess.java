@@ -16,6 +16,12 @@ import net.sf.jasperreports.engine.query.JRXPathQueryExecuterFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRXmlUtils;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.w3c.dom.Document;
 
 public class JasperProcess {
@@ -25,21 +31,54 @@ public class JasperProcess {
 	 * @param args
 	 * @throws JRException 
 	 * @throws IOException 
+	 * @throws ParseException 
 	 */
-    public static void main(String[] args) throws JRException, IOException {
-        // read params from
-        String reportPath = args[0];
-        String sep = File.separator;
-        String report = reportPath + sep + "CustomersReport.jasper";
-        String[] subReports = {reportPath + sep + "OrdersReport.jasper"};
-        String xmlFile = reportPath + sep + "northwind.xml";
-        String destFile = reportPath + sep + "customers.pdf";
+    public static void main(String[] args) throws JRException, IOException, ParseException {
+
+        // create the parser
+        CommandLineParser parser = new BasicParser();
+        Options options = initOptions();
+        CommandLine cmd = parser.parse(options, args);
+
+        if (cmd.hasOption("h")) {
+        	HelpFormatter formatter = new HelpFormatter();
+        	formatter.printHelp("jasper-service", options, true);
+        }
+        
+        String report = cmd.getOptionValue("r");
+        String sub = cmd.getOptionValue("s");
+        String[] subReports = {};
+        if (sub != null) {
+        	subReports = sub.split(",");
+        }
+        String xmlFile = cmd.getOptionValue("d");
+        String destFile = cmd.getOptionValue("o");
+        
+//        String reportPath = args[0];
+//        String sep = File.separator;
+//        String report = reportPath + sep + "CustomersReport.jasper";
+//        String[] subReports = {reportPath + sep + "OrdersReport.jasper"};
+//        String xmlFile = reportPath + sep + "northwind.xml";
+//        String destFile = reportPath + sep + "customers.pdf";
 
         JasperProcess jasperProc = new JasperProcess();
         jasperProc.compileReports(report, subReports);
         Map<String, Object> params = jasperProc.readDataFile(xmlFile);
         jasperProc.pdf(report, params, destFile);
-	}
+    }
+
+    /**
+     * Init options, parse arguments
+     */
+    static private Options initOptions() {
+        Options options = new Options();
+        options.addOption("r", "report", true, "jasper report file path (.jasper file), absolute or relative");
+        options.addOption("d", "data-file", true, "data file path (i.e. .xml data file");
+        options.addOption("o", "output", true, "output file path");
+        options.addOption("s", "sub-reports", false, "comma saparated list of jasper subreports");
+        options.addOption("h", "help", false, "help message");
+        return options;
+    }
     
     public void compileReports(String report, String[] subReports) throws IOException, JRException {
     	compileReport(report);

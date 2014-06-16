@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="libs/commons-beanutils-1.8.0.jar"/>
 	<classpathentry kind="lib" path="libs/xalan-2.7.1.jar"/>
 	<classpathentry kind="lib" path="libs/iText-2.1.7.js2.jar"/>
+	<classpathentry kind="lib" path="libs/commons-cli-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
