@@ -3,5 +3,8 @@
 .project
 /samples/*.jasper
 /samples/*.pdf
+/samples/*.odt
+/samples/*.rtf
+/samples/*.docx
 *.log
 *.properties
