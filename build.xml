@@ -16,6 +16,9 @@
     <mkdir dir="${bin.dir}"/>
   </target>
   
+  <echo>Minimum Java version required: 1.6</echo>
+  <echo>Using Java Home: ${java.home}</echo>
+
   <target name="build" depends="init" description="compiles ${src.dir}" >
   	<javac srcdir="${src.dir}" destdir="${build.dir}"
 		fork="yes"  debug="on" debuglevel="lines,vars,source" target="${javac.target}"  source="${javac.source}" >
