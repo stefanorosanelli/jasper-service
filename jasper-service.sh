@@ -3,7 +3,6 @@
 DIR=$( cd "$( dirname "$0" )" && pwd )
 cd "$DIR"
 
-echo "script dir: $DIR"
 JAR="bin/jasper-service.jar"
 
 JAVA=java
