@@ -36,40 +36,51 @@ import org.w3c.dom.Document;
 public class JasperProcess {
 
     protected final Log log = LogFactory.getLog(getClass());
-
+    static protected Options options;
+    
 	/**
 	 * @param args
 	 * @throws JRException 
 	 * @throws IOException 
 	 * @throws ParseException 
 	 */
-    public static void main(String[] args) throws JRException, IOException, ParseException {
+    public static void main(String[] args) throws JRException, IOException {
 
-        // create the parser
-        CommandLineParser parser = new BasicParser();
-        Options options = initOptions();
-        CommandLine cmd = parser.parse(options, args);
+		try {
+			// create the parser
+			CommandLineParser parser = new BasicParser();
+			Options options = initOptions();
+			CommandLine cmd = parser.parse(options, args);
+			if (cmd.hasOption("h")) {
+				usage();
+				return;
+			}
 
-        if (cmd.hasOption("h")) {
-        	HelpFormatter formatter = new HelpFormatter();
-        	formatter.printHelp("jasper-service", options, true);
-        	return;
-        }
-        
-        String report = cmd.getOptionValue("r");
-        String sub = cmd.getOptionValue("s");
-        String[] subReports = {};
-        if (sub != null) {
-        	subReports = sub.split(",");
-        }
-        String dataFile = cmd.getOptionValue("d");
-        String destFile = cmd.getOptionValue("o");
+			String report = cmd.getOptionValue("r");
+			String sub = cmd.getOptionValue("s");
+			String[] subReports = {};
+			if (sub != null) {
+				subReports = sub.split(",");
+			}
+			String dataFile = cmd.getOptionValue("d");
+			String destFile = cmd.getOptionValue("o");
 
-        JasperProcess jasperProc = new JasperProcess();
-        jasperProc.generate(report, subReports, dataFile, destFile);
-    	System.out.println("output file created: " + destFile);
+			JasperProcess jasperProc = new JasperProcess();
+			jasperProc.generate(report, subReports, dataFile, destFile);
+			System.out.println("output file created: " + destFile);
+
+		} catch (ParseException ex) {
+			System.out.println("jasper-service stopped with errors");			
+			System.err.println("error parsing commandline: " + ex.getMessage());
+			usage();
+		}
     }
 
+
+    static public void usage() {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("jasper-service", options, true);    	
+    }
     
     public void generate(String report, String[] subReports, String dataFile, String destFile) throws IOException, JRException {
     	// compile if needed
@@ -83,16 +94,16 @@ public class JasperProcess {
         String extension = destFile.substring(destFile.lastIndexOf('.')+1).toLowerCase();
         if("pdf".equals(extension)) {
         	log.debug("using pdf format");
-            pdf(print, destFile);        	
+            pdf(print, destFile);
         } else if("docx".equals(extension)) {
         	log.debug("using docx format");
-            docx(print, destFile);        	        	
+            docx(print, destFile);
         } else if("rtf".equals(extension)) {
         	log.debug("using rtf format");
-            rtf(print, destFile);        	        	
+            rtf(print, destFile);
         } else if("odt".equals(extension)) {
         	log.debug("using odt format");
-            odt(print, destFile);        	        	
+            odt(print, destFile);
         }  else {
         	log.warn("unsupported format for file: " + destFile);
         	System.out.println("unsupported format for file: " + destFile);
@@ -104,7 +115,7 @@ public class JasperProcess {
      * Init options, parse arguments
      */
     static private Options initOptions() {
-        Options options = new Options();
+        options = new Options();
         // report option
         Option r = new Option("r", "report", true, "jasper report file path (.jasper file), absolute or relative");
         r.setRequired(true);
@@ -119,9 +130,8 @@ public class JasperProcess {
         options.addOption(o);
         // subreport files option
         Option s = new Option("s", "sub-reports", true, "comma saparated list of jasper subreports file paths");
-        s.setRequired(true);
         options.addOption(s);
-        
+
         options.addOption("h", "help", false, "this help message");
         return options;
     }
