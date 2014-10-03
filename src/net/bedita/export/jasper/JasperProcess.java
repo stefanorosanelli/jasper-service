@@ -64,9 +64,22 @@ public class JasperProcess {
 			}
 			String dataFile = cmd.getOptionValue("d");
 			String destFile = cmd.getOptionValue("o");
-
+			String userParamsStr = cmd.getOptionValue("p");
+			Map<String, String> userParams = new HashMap<String, String>();
+			if (userParamsStr != null) {
+				String[] p = {};
+				p = userParamsStr.split(",");
+				for (String kv : p) {
+					String[] keyVal = kv.split("=");
+					if (keyVal.length != 2) {
+						throw new ParseException("Bad parameter: " + kv);
+					}
+					userParams.put(keyVal[0], keyVal[1]);
+				}
+			}
+			
 			JasperProcess jasperProc = new JasperProcess();
-			jasperProc.generate(report, subReports, dataFile, destFile);
+			jasperProc.generate(report, subReports, dataFile, destFile, userParams);
 			System.out.println("output file created: " + destFile);
 
 		} catch (ParseException ex) {
@@ -82,11 +95,15 @@ public class JasperProcess {
 		formatter.printHelp("jasper-service", options, true);    	
     }
     
-    public void generate(String report, String[] subReports, String dataFile, String destFile) throws IOException, JRException {
+    public void generate(String report, String[] subReports, String dataFile, 
+    		String destFile, Map<String, String> userParams) throws IOException, JRException {
     	// compile if needed
     	compileReports(report, subReports);
     	// prepare params
         Map<String, Object> params = readDataFile(dataFile);
+        for (String k : userParams.keySet()) {
+        	params.put(k, userParams.get(k));
+        }
     	log.debug("generating print data");
         JasperPrint print = JasperFillManager.fillReport(report, params);
 
@@ -124,6 +141,9 @@ public class JasperProcess {
         Option d = new Option("d", "data-file", true, "data file path (i.e. .xml data file");
         d.setRequired(true);
         options.addOption(d);
+        // param option
+        Option p = new Option("p", "param", true, "comma separated list of params in this form: name1=value1,name2=value2");
+        options.addOption(p);
         // output file option
         Option o = new Option("o", "output", true, "output file path");
         o.setRequired(true);
@@ -155,7 +175,7 @@ public class JasperProcess {
         params.put(JRParameter.REPORT_LOCALE, Locale.US);
         return params;
     }
-    
+
     protected void pdf(JasperPrint print, String destFile) throws JRException, IOException {
     	log.debug("exporting to pdf file: " + destFile);
         JasperExportManager.exportReportToPdfFile(print, destFile);
