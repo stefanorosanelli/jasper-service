@@ -56,6 +56,11 @@ public class JasperProcess {
 				return;
 			}
 
+			JasperProcess jasperProc = new JasperProcess();
+			if (cmd.hasOption("c")) {
+				jasperProc.compileDir(cmd.getOptionValue("c"));
+				return;
+			}
 			String report = cmd.getOptionValue("r");
 			String sub = cmd.getOptionValue("s");
 			String[] subReports = {};
@@ -78,7 +83,6 @@ public class JasperProcess {
 				}
 			}
 			
-			JasperProcess jasperProc = new JasperProcess();
 			jasperProc.generate(report, subReports, dataFile, destFile, userParams);
 			System.out.println("output file created: " + destFile);
 
@@ -135,26 +139,31 @@ public class JasperProcess {
         options = new Options();
         // report option
         Option r = new Option("r", "report", true, "jasper report file path (.jasper file), absolute or relative");
-        r.setRequired(true);
         options.addOption(r);
         // data file option
         Option d = new Option("d", "data-file", true, "data file path (i.e. .xml data file");
-        d.setRequired(true);
         options.addOption(d);
         // param option
         Option p = new Option("p", "param", true, "comma separated list of params in this form: name1=value1,name2=value2");
         options.addOption(p);
         // output file option
         Option o = new Option("o", "output", true, "output file path");
-        o.setRequired(true);
         options.addOption(o);
         // subreport files option
         Option s = new Option("s", "sub-reports", true, "comma saparated list of jasper subreports file paths");
         options.addOption(s);
-
+        // compile directory option
+        Option c = new Option("c", "compile-dir", true, "directory path containing .jrxml files to compile");
+        options.addOption(c);
+        // help option
         options.addOption("h", "help", false, "this help message");
         return options;
     }
+
+    protected void compileDir(String dirPath) throws IOException, JRException {
+    	
+    }
+
     
     protected void compileReports(String report, String[] subReports) throws IOException, JRException {
     	log.info("compiling report: " + report);
