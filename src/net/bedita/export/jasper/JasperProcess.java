@@ -69,6 +69,10 @@ public class JasperProcess {
 			}
 			String dataFile = cmd.getOptionValue("d");
 			String destFile = cmd.getOptionValue("o");
+			if (report == null || dataFile == null || destFile == null) {
+				throw new ParseException("Missing parameters");
+			}
+			
 			String userParamsStr = cmd.getOptionValue("p");
 			Map<String, String> userParams = new HashMap<String, String>();
 			if (userParamsStr != null) {
@@ -150,7 +154,7 @@ public class JasperProcess {
         Option o = new Option("o", "output", true, "output file path");
         options.addOption(o);
         // subreport files option
-        Option s = new Option("s", "sub-reports", true, "comma saparated list of jasper subreports file paths");
+        Option s = new Option("s", "sub-reports", true, "comma separeted list of jasper subreports file paths");
         options.addOption(s);
         // compile directory option
         Option c = new Option("c", "compile-dir", true, "directory path containing .jrxml files to compile");
@@ -161,7 +165,21 @@ public class JasperProcess {
     }
 
     protected void compileDir(String dirPath) throws IOException, JRException {
-    	
+    	log.info("compiling reports in: " + dirPath);
+        File dir = new File(dirPath);
+    	for (File fileEntry : dir.listFiles()) {
+            if (!fileEntry.isDirectory()) {
+            	String filePath = fileEntry.getAbsolutePath();
+            	int dotPos = filePath.lastIndexOf(".");
+            	if (dotPos != -1) {
+                	String extension = filePath.substring(dotPos);
+                	if (extension.equals(".jrxml")) {
+                		String jasperFile = filePath.substring(0, dotPos) + ".jasper";
+                		compileReport(jasperFile);
+                	}
+            	}
+            } 
+    	}
     }
 
     
